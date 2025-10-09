@@ -1,74 +1,48 @@
 <template>
-  <div>
-    <h1>{{ mensagem }}</h1>
+<form @submit.prevent="adicionarMensagem">
+  <input v-model.trim="novaMensagem" placeholder="Digite a mensagem" />
+  <button>Adicionar</button>
+</form>
 
-    <p :class ="{destaque: contadorA > contadorB}">Contador: {{ contadorA }}</p>
-
-    <button @click="incrementarA">+1</button>
-    <button @click="decrementarA">-1</button>
-
-    <p :class ="{destaque: contadorB > contadorA}">Contador: {{ contadorB }}</p>
-
-    <button @click="incrementarB">+1</button>
-    <button @click="decrementarB">-1</button>
-    
-    <p>A soma dos contadores é: {{ contadoresSomados }}</p>
-  </div>
+<ul v-if="estado.itens.length">
+  <li v-for="m in estado.itens" :key="m.id">
+    #{{ m.id }} — {{ m.texto }}
+  </li>
+</ul>
+<p v-else>Lista vazia.</p>
 </template>
 
 <script setup>
-import { ref, computed  } from 'vue'
+import { reactive, ref } from 'vue'
 
-const mensagem = ref('Atividade Contador')
+const estado = reactive({
+  nextId: 3,
+  itens: [
+    { id: 1, texto: 'Olá Mundo' },
+    { id: 2, texto: 'Aula de Vicente' }
+  ]
+})
 
-const contadorA = ref(0)
+const novaMensagem = ref('')
 
-const contadorB = ref(0)
-
-function incrementarA() {
-  contadorA.value++  
+function adicionarMensagem() {
+  if (!novaMensagem.value) return
+  estado.itens.push({
+    id: estado.nextId++,
+    texto: novaMensagem.value
+  })
+  novaMensagem.value = ''
 }
 
-function decrementarA() {
-  contadorA.value--
+function removerMensagem(id) {
+  estado.itens = estado.itens.filter(m => m.id !== id)
 }
-
-function incrementarB() {
-  contadorB.value++  
-}
-
-function decrementarB() {
-  contadorB.value--
-}
-
-const contadoresSomados = computed(() => contadorA.value + contadorB.value)
 </script>
 
 <style scoped>
-h1 {
-  color: #42b983;
-  font-size: 2rem;
-  text-align: center;
-  margin-top: 50px;
-}
-
-p {
-  text-align: center;
-  font-size: 1.2rem;
-  margin-top: 10px;
-}
-
-button {
-  display: inline;
-  margin: 10px 10px;
-  padding: 5px 15px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.destaque{
-  background-color: #42b983;
-  color: white;
-  border-radius: 10px
-}
+form { margin: 8px 0; }
+input { padding: 6px; margin-right: 6px; }
+ul { margin-top: 10px; padding-left: 20px; }
+li { margin-bottom: 6px; }
+button { cursor: pointer; }
 </style>
